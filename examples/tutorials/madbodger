@@ -1,0 +1,23 @@
+SRCS    = wurse.c parse.c build.c special.c rndwrd.c output.c ll.c \
+        parseconf.tab.c lex.yy.c
+OBJS    = $(SRCS:.c=.o)
+
+wurse: $(OBJS)
+    $(CC) $(LDFLAGS) $(OBJS) $(LIBS) -o $@
+
+$(OBJS): wurse.h parseconf.tab.h lex.yy.c
+
+parseconf.tab.c parseconf.tab.h: parseconf.y
+    $(YACC) -d parseconf.y
+
+lex.yy.c: keywords.l
+    $(LEX) keywords.l
+
+lex.yy.o: parseconf.tab.h
+    $(CC) $(CFLAGS) $(LDEBUG) -c lex.yy.c
+
+parseconf.tab.o:
+    $(CC) $(CFLAGS) $(YDEBUG) -c parseconf.tab.c
+
+.c.o:
+    $(CC) $(CFLAGS) -c $<

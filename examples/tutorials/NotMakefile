@@ -1,0 +1,39 @@
+PROJECT = My first makefile
+EXECUTABLE = MyProgram
+SOURCE = file1.c file2.c file3.c
+OBJECTS = file1.o file2.o file3.o
+#This is an easier way to define OBJECTS:
+#OBJECTS = $(OBJECTS:%.c=%.o)
+
+help:
+   echo Here is a help message
+
+# Prior to "backup", make will run "clean".
+backup: clean
+   cd .. && tar czvf /backup/$(PROJECT).tar.gz $(PROJECT)
+
+clean:
+   rm -f $(OBJECTS) $(EXECUTABLE)
+
+CFLAGS = -Wall -ggdb3 -DSOME_DEFINE=1
+LDFLAGS = -L/usr/local/lib -lsomelibname
+
+# All the magic is here
+
+# This is your main target, which depends upon target "program",
+# you executable file.
+
+all: $(EXECUTABLE)
+
+# To build "$(EXECUTABLE)", you first need to build all separeted object file,
+# i.e., each of your .c file must produce a corresponding .o file
+# The special variable $@ means "the target name". On this case, it is "$(EXECUTABLE)'s value"
+# The special variable $^ means "all depend targets". On this case, it is $(OBJECTS)'s value
+
+$(EXECUTABLE): $(OBJECTS)
+   gcc $(LDFLAGS) $(CFLAGS) -o $@ $^
+
+# This is where any .c file becomes .o file
+
+%.o: %.c
+   gcc $(CFLAGS) -c $^ -o $@
